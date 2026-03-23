@@ -1,0 +1,33 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Models & large outputs (keep structure with .gitkeep)
+models/*.pkl
+models/*.keras
+models/*.h5
+outputs/plots/*
+outputs/metrics/*
+outputs/predictions/*
+!models/.gitkeep
+!outputs/plots/.gitkeep
+!outputs/metrics/.gitkeep
+!outputs/predictions/.gitkeep
+
+# Data (regenerate with generate_data.py)
+data/raw/*.csv
+data/processed/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
