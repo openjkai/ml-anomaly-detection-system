@@ -1,0 +1,66 @@
+---
+description: Conventional Commits — feat/fix/chore + optional (scope), no tool footers
+alwaysApply: true
+---
+
+# Git commit messages (Conventional Commits)
+
+## Format (required)
+
+Use **one line** for the subject:
+
+```text
+<type>(<scope>): <description>
+```
+
+- **`type`** (pick one): `feat` | `fix` | `chore` | `docs` | `style` | `refactor` | `test` | `ci` | `perf` | `build` | `revert`
+- **`(scope)`** — **optional**. Short area in **lowercase**, e.g. `(api)`, `(data)`, `(models)`, `(ml)`, `(deps)`. Omit both parentheses when there is no scope: `feat: add training script`.
+- **`description`** — imperative, **lowercase** after the colon, no trailing period, **~50 chars or less** when possible.
+
+### Examples (good)
+
+```text
+feat(data): add synthetic metrics generator
+fix(ml): correct train/test temporal split
+chore(deps): bump ruff and add pyproject
+docs: update quick start for preprocess step
+refactor(api): extract score helpers
+test: add isolation forest smoke test
+```
+
+### Examples (avoid)
+
+```text
+Update stuff
+fixed bug
+FEAT: BAD CASING
+feat: Add Periods.
+```
+
+## Breaking changes
+
+- Add `!` after type/scope: `feat(api)!: remove legacy /score route`
+- Or put `BREAKING CHANGE: ...` in the commit body (blank line after subject).
+
+## Body (optional)
+
+After a **blank line**, explain *why* or add links. Keep subject one line.
+
+## Do not add tool or vendor footers
+
+- Never append `Made-with: Cursor`, `Co-authored-by: Cursor`, or similar.
+- Do not add sign-offs unless the user asks.
+
+### Cursor app (human commits from the UI)
+
+To stop Cursor from appending its own trailer: **Cursor Settings → Agent → Attribution** — disable attribution (labels vary by version).
+
+## When the “generate commit message” action fails or looks wrong
+
+- Ensure the folder is a **git repo** and there are **staged changes** (the generator often uses the diff).
+- Reload the window after changing rules.
+- If generation still does nothing, use **Chat** and ask: “Write a conventional commit for my staged changes” — this rule still applies.
+
+## If history used a different style
+
+When amending or matching older commits that are not conventional, match that branch’s style for consistency, unless the user asks to standardize.

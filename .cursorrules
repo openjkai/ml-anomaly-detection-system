@@ -1,0 +1,4 @@
+# Commits (Conventional Commits)
+# Subject line format: type(scope): imperative description
+# Types: feat, fix, chore, docs, style, refactor, test, ci, perf, build, revert
+# Scope is optional; use lowercase inside parentheses, e.g. feat(data): add generator

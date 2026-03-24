@@ -1,0 +1,45 @@
+{
+  "conventionalCommits.promptScopes": true,
+  "conventionalCommits.scopes": [
+    "api",
+    "data",
+    "models",
+    "ml",
+    "deps",
+    "ci",
+    "tests",
+    "notebook"
+  ],
+  "conventionalCommits.gitmoji": false,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.smoothScrolling": true,
+  "editor.minimap.enabled": true,
+  "editor.renderWhitespace": "selection",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [88]
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  }
+}

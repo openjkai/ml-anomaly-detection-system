@@ -1,0 +1,10 @@
+# Conventional Commits — edit the line below; remove comment lines before saving.
+#
+# <type>(<scope>): <subject>
+#
+# type: feat | fix | chore | docs | style | refactor | test | ci | perf | build | revert
+# scope: optional, e.g. api, data, models, ml — use lowercase inside ( )
+#
+# Examples:
+# feat(data): add raw metrics loader
+# fix: handle empty train split

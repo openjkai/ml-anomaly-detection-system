@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "vivaxy.vscode-conventional-commits",
+    "esbenp.prettier-vscode",
+    "ms-python.python",
+    "charliermarsh.ruff",
+    "editorconfig.editorconfig",
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml"
+  ]
+}
