@@ -17,9 +17,12 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python src/generate_data.py
 python src/preprocess.py
+python src/train_isolation_forest.py
 ```
 
 This writes `data/raw/metrics.csv`, then `data/processed/train.csv`, `data/processed/test.csv`, and `models/scaler.pkl` (artifacts are gitignored by default; regenerate anytime).
+
+Training saves `models/isolation_forest.pkl`, `outputs/metrics/isolation_forest_summary.txt`, and `outputs/predictions/isolation_forest_test.csv`.
 
 **Preprocessing notes:** CSVs keep **unscaled** feature columns; training scripts should `joblib.load` the scaler and transform `FEATURE_COLUMNS` before fitting models.
 
