@@ -17,6 +17,7 @@ PROCESSED_TEST_CSV = DATA_PROCESSED_DIR / "test.csv"
 
 MODEL_ISOLATION_FOREST = MODELS_DIR / "isolation_forest.pkl"
 MODEL_AUTOENCODER = MODELS_DIR / "autoencoder.keras"
+MODEL_AUTOENCODER_THRESHOLD = MODELS_DIR / "autoencoder_threshold.json"
 MODEL_SCALER = MODELS_DIR / "scaler.pkl"
 
 FEATURE_COLUMNS = [

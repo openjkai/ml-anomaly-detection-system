@@ -18,6 +18,7 @@ build/
 models/*.pkl
 models/*.keras
 models/*.h5
+models/*.json
 outputs/plots/*
 outputs/metrics/*
 outputs/predictions/*
