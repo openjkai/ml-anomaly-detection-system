@@ -32,7 +32,9 @@ from features import feature_matrix, validate_feature_columns
 from utils import set_random_seed
 
 
-def load_processed(train_path: Path, test_path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_processed(
+    train_path: Path, test_path: Path
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     train = pd.read_csv(train_path, parse_dates=["timestamp"])
     test = pd.read_csv(test_path, parse_dates=["timestamp"])
     validate_feature_columns(train)
@@ -147,12 +149,16 @@ def run_train(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train dense autoencoder for anomaly detection")
+    parser = argparse.ArgumentParser(
+        description="Train dense autoencoder for anomaly detection"
+    )
     parser.add_argument("--train", type=Path, default=PROCESSED_TRAIN_CSV)
     parser.add_argument("--test", type=Path, default=PROCESSED_TEST_CSV)
     parser.add_argument("--scaler", type=Path, default=MODEL_SCALER)
     parser.add_argument("--output", type=Path, default=MODEL_AUTOENCODER)
-    parser.add_argument("--threshold-out", type=Path, default=MODEL_AUTOENCODER_THRESHOLD)
+    parser.add_argument(
+        "--threshold-out", type=Path, default=MODEL_AUTOENCODER_THRESHOLD
+    )
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=32)

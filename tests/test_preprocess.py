@@ -11,7 +11,11 @@ SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
 
 from generate_data import generate_dataframe  # noqa: E402
-from preprocess import clean_dataframe, run_preprocess, temporal_train_test_split  # noqa: E402
+from preprocess import (  # noqa: E402
+    clean_dataframe,
+    run_preprocess,
+    temporal_train_test_split,
+)
 
 
 def test_temporal_split_order():
@@ -36,7 +40,11 @@ def test_temporal_split_order():
 def test_clean_drops_duplicate_timestamps():
     df = pd.DataFrame(
         {
-            "timestamp": ["2026-01-01 00:00:00", "2026-01-01 00:00:00", "2026-01-01 01:00:00"],
+            "timestamp": [
+                "2026-01-01 00:00:00",
+                "2026-01-01 00:00:00",
+                "2026-01-01 01:00:00",
+            ],
             "cpu_usage": [1.0, 99.0, 2.0],
             "memory_usage": [50.0, 50.0, 51.0],
             "request_latency_ms": [100.0, 900.0, 101.0],

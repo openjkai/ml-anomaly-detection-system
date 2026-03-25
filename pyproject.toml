@@ -7,3 +7,5 @@ quote-style = "double"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+# E501: line length — `ruff format` wraps code; docstrings/long strings often stay >88.
+ignore = ["E501"]

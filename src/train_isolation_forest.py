@@ -15,7 +15,6 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 
 from config import (
-    FEATURE_COLUMNS,
     MODEL_ISOLATION_FOREST,
     MODEL_SCALER,
     OUTPUTS_METRICS_DIR,
@@ -28,7 +27,9 @@ from features import feature_matrix, validate_feature_columns
 from utils import set_random_seed
 
 
-def load_processed(train_path: Path, test_path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_processed(
+    train_path: Path, test_path: Path
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     train = pd.read_csv(train_path, parse_dates=["timestamp"])
     test = pd.read_csv(test_path, parse_dates=["timestamp"])
     validate_feature_columns(train)
@@ -60,7 +61,9 @@ def train_isolation_forest(
     return model
 
 
-def score_points(model: IsolationForest, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def score_points(
+    model: IsolationForest, X: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Return (anomaly_score, is_outlier).
 

@@ -26,20 +26,10 @@ def build_baseline(n: int, rng: np.random.Generator) -> dict[str, np.ndarray]:
     day = 2 * np.pi * h / 24.0
     week = 2 * np.pi * h / (24.0 * 7.0)
 
-    cpu = (
-        38.0
-        + 14.0 * np.sin(day)
-        + 5.0 * np.sin(week + 0.3)
-        + rng.normal(0.0, 2.5, n)
-    )
+    cpu = 38.0 + 14.0 * np.sin(day) + 5.0 * np.sin(week + 0.3) + rng.normal(0.0, 2.5, n)
     cpu = np.clip(cpu, 5.0, 85.0)
 
-    mem = (
-        46.0
-        + 9.0 * np.sin(day + 0.8)
-        + 3.5 * np.sin(week)
-        + rng.normal(0.0, 1.8, n)
-    )
+    mem = 46.0 + 9.0 * np.sin(day + 0.8) + 3.5 * np.sin(week) + rng.normal(0.0, 1.8, n)
     mem = np.clip(mem, 10.0, 92.0)
 
     latency = (
@@ -66,11 +56,7 @@ def build_baseline(n: int, rng: np.random.Generator) -> dict[str, np.ndarray]:
     )
     req = np.maximum(req, 80.0)
 
-    disk = (
-        28.0
-        + 11.0 * np.sin(day + 2.0)
-        + rng.normal(0.0, 4.0, n)
-    )
+    disk = 28.0 + 11.0 * np.sin(day + 2.0) + rng.normal(0.0, 4.0, n)
     disk = np.clip(disk, 5.0, 120.0)
 
     net = (
@@ -151,7 +137,9 @@ def inject_anomalies(
 
         if kind == "cpu_spike":
             data["cpu_usage"][start:end] = rng.uniform(91.0, 97.0, size=end - start)
-            data["request_latency_ms"][start:end] += rng.uniform(40.0, 120.0, size=end - start)
+            data["request_latency_ms"][start:end] += rng.uniform(
+                40.0, 120.0, size=end - start
+            )
         elif kind == "memory_leak":
             ramp = np.linspace(0.0, 1.0, end - start)
             data["memory_usage"][start:end] = np.clip(
@@ -160,21 +148,27 @@ def inject_anomalies(
                 99.0,
             )
         elif kind == "latency_spike":
-            data["request_latency_ms"][start:end] = rng.uniform(850.0, 1400.0, size=end - start)
+            data["request_latency_ms"][start:end] = rng.uniform(
+                850.0, 1400.0, size=end - start
+            )
         elif kind == "error_burst":
             data["error_rate"][start:end] = rng.uniform(0.18, 0.38, size=end - start)
         elif kind == "traffic_crash_business":
             seg_idx = np.arange(start, end)
             bh = business[seg_idx]
             if bh.any():
-                data["request_count"][seg_idx[bh]] = rng.uniform(15.0, 55.0, size=int(bh.sum()))
+                data["request_count"][seg_idx[bh]] = rng.uniform(
+                    15.0, 55.0, size=int(bh.sum())
+                )
         elif kind == "disk_network_surge":
             data["disk_io"][start:end] = rng.uniform(85.0, 115.0, size=end - start)
             data["network_in_mb"][start:end] = rng.uniform(8.0, 35.0, size=end - start)
         else:  # combo_api_incident
             data["cpu_usage"][start:end] = rng.uniform(82.0, 94.0, size=end - start)
             data["memory_usage"][start:end] = rng.uniform(78.0, 92.0, size=end - start)
-            data["request_latency_ms"][start:end] = rng.uniform(700.0, 1100.0, size=end - start)
+            data["request_latency_ms"][start:end] = rng.uniform(
+                700.0, 1100.0, size=end - start
+            )
             data["error_rate"][start:end] = rng.uniform(0.12, 0.30, size=end - start)
 
         mark(start, end)
@@ -207,7 +201,9 @@ def generate_dataframe(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate synthetic metrics.csv")
-    parser.add_argument("--days", type=int, default=30, help="Number of days of history")
+    parser.add_argument(
+        "--days", type=int, default=30, help="Number of days of history"
+    )
     parser.add_argument(
         "--output",
         type=Path,

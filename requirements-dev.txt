@@ -1,0 +1,3 @@
+# Dev-only: hooks and local tooling (not required for runtime or CI as wired today)
+-r requirements.txt
+pre-commit>=3.5.0

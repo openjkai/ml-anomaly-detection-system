@@ -15,13 +15,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from sklearn.ensemble import IsolationForest
 from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     precision_recall_fscore_support,
     roc_auc_score,
 )
-from sklearn.ensemble import IsolationForest
 
 from config import (
     MODEL_AUTOENCODER,
@@ -33,8 +33,8 @@ from config import (
     PROCESSED_TEST_CSV,
 )
 from features import feature_matrix, validate_feature_columns
-from train_isolation_forest import score_points
 from train_autoencoder import reconstruction_mse
+from train_isolation_forest import score_points
 
 
 def load_threshold(path: Path) -> float:
@@ -80,10 +80,22 @@ def plot_timeline(
     out_path: Path,
 ) -> None:
     fig, ax = plt.subplots(figsize=(12, 3))
-    ax.plot(df["timestamp"], df[score_col], color="steelblue", linewidth=0.8, label=score_col)
+    ax.plot(
+        df["timestamp"],
+        df[score_col],
+        color="steelblue",
+        linewidth=0.8,
+        label=score_col,
+    )
     hits = df[df[flag_col] == 1]
     if not hits.empty:
-        ax.scatter(hits["timestamp"], hits[score_col], color="crimson", s=8, label="pred anomaly")
+        ax.scatter(
+            hits["timestamp"],
+            hits[score_col],
+            color="crimson",
+            s=8,
+            label="pred anomaly",
+        )
     true_hits = df[df["is_anomaly"] == 1]
     if not true_hits.empty:
         ax.scatter(
@@ -104,7 +116,9 @@ def plot_timeline(
     plt.close(fig)
 
 
-def plot_score_hist(scores: np.ndarray, labels: np.ndarray, title: str, out_path: Path) -> None:
+def plot_score_hist(
+    scores: np.ndarray, labels: np.ndarray, title: str, out_path: Path
+) -> None:
     fig, ax = plt.subplots(figsize=(6, 3))
     ax.hist(scores[labels == 0], bins=40, alpha=0.7, label="normal", color="steelblue")
     ax.hist(scores[labels == 1], bins=40, alpha=0.7, label="anomaly", color="crimson")
@@ -176,7 +190,9 @@ def run_evaluate(
         lines.append("")
 
     metrics_dir.mkdir(parents=True, exist_ok=True)
-    (metrics_dir / "classification_report.txt").write_text("\n".join(lines), encoding="utf-8")
+    (metrics_dir / "classification_report.txt").write_text(
+        "\n".join(lines), encoding="utf-8"
+    )
 
     summary_lines = []
     for name, y_pred, scores in (
@@ -188,31 +204,55 @@ def run_evaluate(
             f"{name}: precision={m['precision']:.4f} recall={m['recall']:.4f} "
             f"f1={m['f1']:.4f} roc_auc={m['roc_auc']}"
         )
-    (metrics_dir / "summary_metrics.txt").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+    (metrics_dir / "summary_metrics.txt").write_text(
+        "\n".join(summary_lines) + "\n", encoding="utf-8"
+    )
 
     cm_if = confusion_matrix(y_true, if_flags)
     cm_ae = confusion_matrix(y_true, ae_flags)
-    plot_confusion_matrix(cm_if, "Isolation Forest", plots_dir / "confusion_matrix_if.png")
-    plot_confusion_matrix(cm_ae, "Autoencoder (MSE)", plots_dir / "confusion_matrix_ae.png")
+    plot_confusion_matrix(
+        cm_if, "Isolation Forest", plots_dir / "confusion_matrix_if.png"
+    )
+    plot_confusion_matrix(
+        cm_ae, "Autoencoder (MSE)", plots_dir / "confusion_matrix_ae.png"
+    )
 
     df_if = test_df[["timestamp", "is_anomaly"]].copy()
     df_if["score"] = if_scores
     df_if["pred"] = if_flags
-    plot_timeline(df_if, "score", "pred", "Isolation Forest scores", plots_dir / "timeline_if.png")
+    plot_timeline(
+        df_if, "score", "pred", "Isolation Forest scores", plots_dir / "timeline_if.png"
+    )
 
     df_ae = test_df[["timestamp", "is_anomaly"]].copy()
     df_ae["score"] = ae_scores
     df_ae["pred"] = ae_flags
     plot_timeline(
-        df_ae, "score", "pred", "Autoencoder reconstruction MSE", plots_dir / "timeline_ae.png"
+        df_ae,
+        "score",
+        "pred",
+        "Autoencoder reconstruction MSE",
+        plots_dir / "timeline_ae.png",
     )
 
-    plot_score_hist(if_scores, y_true, "IF anomaly score distribution", plots_dir / "score_hist_if.png")
-    plot_score_hist(ae_scores, y_true, "AE reconstruction MSE distribution", plots_dir / "score_hist_ae.png")
+    plot_score_hist(
+        if_scores,
+        y_true,
+        "IF anomaly score distribution",
+        plots_dir / "score_hist_if.png",
+    )
+    plot_score_hist(
+        ae_scores,
+        y_true,
+        "AE reconstruction MSE distribution",
+        plots_dir / "score_hist_ae.png",
+    )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Evaluate anomaly detectors on test split")
+    parser = argparse.ArgumentParser(
+        description="Evaluate anomaly detectors on test split"
+    )
     parser.add_argument("--test", type=Path, default=PROCESSED_TEST_CSV)
     parser.add_argument("--scaler", type=Path, default=MODEL_SCALER)
     parser.add_argument("--isolation-forest", type=Path, default=MODEL_ISOLATION_FOREST)

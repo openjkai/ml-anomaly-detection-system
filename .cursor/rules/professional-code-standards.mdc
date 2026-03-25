@@ -1,0 +1,39 @@
+---
+description: Professional Python — focused edits, Ruff, types, structure, tests
+alwaysApply: true
+---
+
+# Professional codebase standards
+
+## Scope of changes
+
+- Change **only** what the task requires. No drive-by refactors, unrelated file edits, or scope creep.
+- Match **existing** naming, imports, types, and docstring depth in the touched files.
+- Do **not** add README/docs/markdown the user did not ask for.
+
+## Python style (this repo)
+
+- **Ruff** is the source of truth: `line-length = 88`, `target-version = "py310"`, `select = ["E", "F", "I"]`, `ignore = ["E501"]` (formatter wraps code; long docstrings are OK), double quotes for format. Run `ruff check` / `ruff format` before considering work done.
+- Prefer **type hints** on public functions and non-trivial locals; avoid `Any` unless unavoidable.
+- Prefer **small, testable functions** over long scripts; keep `if __name__ == "__main__"` blocks thin.
+- Use **`logging`** for operational messages where it fits the file’s pattern; avoid noisy `print` in library-style modules.
+
+## Structure and reuse
+
+- **DRY**: extract shared load/transform/scoring logic when the same pattern appears in multiple scripts — but only when it clearly serves the task or obvious duplication.
+- **Imports**: stdlib → third-party → local; no unused imports; fix `I` (isort) issues Ruff reports.
+- **Paths and config**: keep paths and constants in `config.py` (or the project’s existing config module); avoid hard-coded absolute paths in code.
+
+## Tests and correctness
+
+- New behavior gets **tests** when it is non-trivial or easy to regress; keep tests **fast** and **deterministic** (fixed seeds, temp dirs).
+- Prefer **assertions** and clear failure messages over silent fallbacks that hide bugs.
+
+## Commits and hygiene
+
+- Commit messages follow **`.cursor/rules/git-commit-messages.mdc`** (Conventional Commits, no tool footers).
+- Do not commit secrets, large binaries, or generated artifacts that belong in `.gitignore`.
+
+## When unsure
+
+- Read neighboring code first, then extend it — the result should read as if **one author** wrote the file.
