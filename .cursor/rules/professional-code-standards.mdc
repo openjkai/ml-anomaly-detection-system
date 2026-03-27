@@ -31,7 +31,7 @@ alwaysApply: true
 
 ## Commits and hygiene
 
-- Commit messages follow **`.cursor/rules/git-commit-messages.mdc`** (Conventional Commits, no tool footers).
+- Commit messages follow **`.cursor/rules/git-commit-messages.mdc`**: Conventional Commits, **one sentence**, subject **≤100 characters**, no tool footers.
 - Do not commit secrets, large binaries, or generated artifacts that belong in `.gitignore`.
 
 ## When unsure

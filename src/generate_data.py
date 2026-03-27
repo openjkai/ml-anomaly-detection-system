@@ -218,7 +218,7 @@ def main() -> None:
 
     df = generate_dataframe(days=args.days, seed=args.seed)
     # Column order per spec
-    cols = ["timestamp"] + FEATURE_COLUMNS + ["is_anomaly"]
+    cols = ["timestamp", *FEATURE_COLUMNS, "is_anomaly"]
     df = df[cols]
     df.to_csv(out, index=False, float_format="%.4f")
 

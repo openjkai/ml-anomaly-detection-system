@@ -41,10 +41,11 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     dup = out.duplicated(subset=["timestamp"], keep="first")
     if dup.any():
         out = out.loc[~dup].reset_index(drop=True)
-    num_cols = FEATURE_COLUMNS + ["is_anomaly"]
+    num_cols = [*FEATURE_COLUMNS, "is_anomaly"]
     out[num_cols] = out[num_cols].apply(pd.to_numeric, errors="coerce")
-    out[FEATURE_COLUMNS] = out[FEATURE_COLUMNS].ffill().bfill()
-    out = out.dropna(subset=FEATURE_COLUMNS)
+    feat = list(FEATURE_COLUMNS)
+    out[feat] = out[feat].ffill().bfill()
+    out = out.dropna(subset=feat)
     out["is_anomaly"] = out["is_anomaly"].fillna(0).astype(int)
     return out
 

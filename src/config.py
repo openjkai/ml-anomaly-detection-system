@@ -2,7 +2,12 @@
 
 from pathlib import Path
 
+import features as _features
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# Re-export for callers using ``from config import FEATURE_COLUMNS``.
+FEATURE_COLUMNS = _features.FEATURE_COLUMNS
 
 DATA_RAW_DIR = PROJECT_ROOT / "data" / "raw"
 DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
@@ -19,16 +24,6 @@ MODEL_ISOLATION_FOREST = MODELS_DIR / "isolation_forest.pkl"
 MODEL_AUTOENCODER = MODELS_DIR / "autoencoder.keras"
 MODEL_AUTOENCODER_THRESHOLD = MODELS_DIR / "autoencoder_threshold.json"
 MODEL_SCALER = MODELS_DIR / "scaler.pkl"
-
-FEATURE_COLUMNS = [
-    "cpu_usage",
-    "memory_usage",
-    "request_latency_ms",
-    "error_rate",
-    "request_count",
-    "disk_io",
-    "network_in_mb",
-]
 
 RANDOM_SEED = 42
 DEFAULT_TEST_SIZE = 0.2

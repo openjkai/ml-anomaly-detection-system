@@ -1,13 +1,15 @@
 ---
-description: Conventional Commits — feat/fix/chore + optional (scope), no tool footers
+description: Conventional Commits — one subject line ≤100 chars, one sentence, no tool footers
 alwaysApply: true
 ---
 
 # Git commit messages (Conventional Commits)
 
-## Format (required)
+## Subject line (required)
 
-Use **one line** for the subject:
+- **Exactly one line** — the whole commit message is **one sentence** (no second sentence on the same line; no `;` chaining two ideas).
+- **Maximum 100 characters** for the **entire** subject (count spaces; `type`, optional `scope`, colon, and description all count).
+- Use Conventional Commits shape:
 
 ```text
 <type>(<scope>): <description>
@@ -15,17 +17,16 @@ Use **one line** for the subject:
 
 - **`type`** (pick one): `feat` | `fix` | `chore` | `docs` | `style` | `refactor` | `test` | `ci` | `perf` | `build` | `revert`
 - **`(scope)`** — **optional**. Short area in **lowercase**, e.g. `(api)`, `(data)`, `(models)`, `(ml)`, `(deps)`. Omit both parentheses when there is no scope: `feat: add training script`.
-- **`description`** — imperative, **lowercase** after the colon, no trailing period, **~50 chars or less** when possible.
+- **`description`** — imperative mood, **lowercase** after the colon, **no trailing period**.
 
-### Examples (good)
+### Examples (good — each ≤100 chars, one sentence)
 
 ```text
 feat(data): add synthetic metrics generator
 fix(ml): correct train/test temporal split
 chore(deps): bump ruff and add pyproject
 docs: update quick start for preprocess step
-refactor(api): extract score helpers
-test: add isolation forest smoke test
+refactor(features): centralize column spec and numeric validation
 ```
 
 ### Examples (avoid)
@@ -35,16 +36,19 @@ Update stuff
 fixed bug
 FEAT: BAD CASING
 feat: Add Periods.
+refactor: do X; also do Y
 ```
+
+(Too long — shorten or drop scope until the full line is ≤100 characters.)
 
 ## Breaking changes
 
-- Add `!` after type/scope: `feat(api)!: remove legacy /score route`
-- Or put `BREAKING CHANGE: ...` in the commit body (blank line after subject).
+- Add `!` after type/scope: `feat(api)!: remove legacy score route` (still must be ≤100 chars).
+- Or put `BREAKING CHANGE: ...` in the commit **body** (blank line after subject). Body does not count toward the 100-character rule.
 
 ## Body (optional)
 
-After a **blank line**, explain *why* or add links. Keep subject one line.
+After a **blank line**, explain *why* or add links. The **subject** stays one line and ≤100 chars.
 
 ## Do not add tool or vendor footers
 
