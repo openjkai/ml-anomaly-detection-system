@@ -23,7 +23,7 @@ from config import (
     RANDOM_SEED,
     RAW_METRICS_CSV,
 )
-from features import feature_matrix, validate_feature_columns
+from features import FEATURE_COLUMNS_LIST, feature_matrix, validate_feature_columns
 from utils import set_random_seed
 
 
@@ -43,9 +43,8 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         out = out.loc[~dup].reset_index(drop=True)
     num_cols = [*FEATURE_COLUMNS, "is_anomaly"]
     out[num_cols] = out[num_cols].apply(pd.to_numeric, errors="coerce")
-    feat = list(FEATURE_COLUMNS)
-    out[feat] = out[feat].ffill().bfill()
-    out = out.dropna(subset=feat)
+    out[FEATURE_COLUMNS_LIST] = out[FEATURE_COLUMNS_LIST].ffill().bfill()
+    out = out.dropna(subset=FEATURE_COLUMNS_LIST)
     out["is_anomaly"] = out["is_anomaly"].fillna(0).astype(int)
     return out
 

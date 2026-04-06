@@ -18,6 +18,20 @@ FEATURE_COLUMNS: tuple[str, ...] = (
 
 N_FEATURES: int = len(FEATURE_COLUMNS)
 
+# Pandas treats a tuple of labels as a MultiIndex key; use a list for normal columns.
+FEATURE_COLUMNS_LIST: list[str] = list(FEATURE_COLUMNS)
+
+__all__ = [
+    "FEATURE_COLUMNS",
+    "FEATURE_COLUMNS_LIST",
+    "N_FEATURES",
+    "assert_finite_feature_array",
+    "assert_numeric_feature_columns",
+    "feature_frame",
+    "feature_matrix",
+    "validate_feature_columns",
+]
+
 
 def validate_feature_columns(df: pd.DataFrame) -> None:
     """Ensure all feature names exist (e.g. after loading CSV). Does not require numeric dtypes."""
@@ -39,8 +53,22 @@ def assert_numeric_feature_columns(df: pd.DataFrame) -> None:
         )
 
 
+def assert_finite_feature_array(X: np.ndarray) -> None:
+    """Reject NaN/inf in a feature matrix before scaling or model forward passes."""
+    if X.size and not np.isfinite(X).all():
+        raise ValueError("Feature matrix contains non-finite values (NaN or inf)")
+
+
+def feature_frame(df: pd.DataFrame, *, copy: bool = False) -> pd.DataFrame:
+    """Return only feature columns in ``FEATURE_COLUMNS`` order (for inspection or export)."""
+    assert_numeric_feature_columns(df)
+    out = df.loc[:, FEATURE_COLUMNS_LIST]
+    return out.copy() if copy else out
+
+
 def feature_matrix(df: pd.DataFrame) -> np.ndarray:
     """Return (n_samples, n_features) float array in ``FEATURE_COLUMNS`` order."""
     assert_numeric_feature_columns(df)
-    # list() so pandas does not treat a tuple as a MultiIndex key
-    return df.loc[:, list(FEATURE_COLUMNS)].to_numpy(dtype=np.float64, copy=False)
+    X = df.loc[:, FEATURE_COLUMNS_LIST].to_numpy(dtype=np.float64, copy=False)
+    assert_finite_feature_array(X)
+    return X
