@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.preprocessing import StandardScaler
 
 SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
@@ -18,6 +19,9 @@ from features import (  # noqa: E402
     assert_numeric_feature_columns,
     feature_frame,
     feature_matrix,
+    read_metrics_csv,
+    read_train_test_csv,
+    scaled_feature_matrix,
     validate_feature_columns,
 )
 
@@ -90,3 +94,37 @@ def test_assert_finite_feature_array():
     assert_finite_feature_array(np.array([[1.0, 2.0]]))
     with pytest.raises(ValueError, match="non-finite"):
         assert_finite_feature_array(np.array([[np.nan]]))
+
+
+def test_read_train_test_csv(tmp_path: Path):
+    row = _minimal_numeric_row()
+    train = pd.DataFrame([row, row])
+    test = pd.DataFrame([row])
+    tp = tmp_path / "train.csv"
+    tsp = tmp_path / "test.csv"
+    train.to_csv(tp, index=False)
+    test.to_csv(tsp, index=False)
+    a, b = read_train_test_csv(tp, tsp)
+    assert len(a) == 2 and len(b) == 1
+
+
+def test_read_metrics_csv_requires_labels(tmp_path: Path):
+    row = _minimal_numeric_row()
+    p = tmp_path / "m.csv"
+    pd.DataFrame([row]).to_csv(p, index=False)
+    with pytest.raises(ValueError, match="is_anomaly"):
+        read_metrics_csv(p)
+    df = pd.DataFrame([{**row, "is_anomaly": 0}])
+    df.to_csv(p, index=False)
+    assert len(read_metrics_csv(p)) == 1
+
+
+def test_scaled_feature_matrix_dtype():
+    row = _minimal_numeric_row()
+    df = pd.DataFrame([row])
+    scaler = StandardScaler()
+    scaler.fit(feature_matrix(df))
+    X64 = scaled_feature_matrix(df, scaler)
+    X32 = scaled_feature_matrix(df, scaler, dtype=np.float32)
+    assert X64.dtype == np.float64
+    assert X32.dtype == np.float32

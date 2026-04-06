@@ -23,18 +23,8 @@ from config import (
     PROCESSED_TRAIN_CSV,
     RANDOM_SEED,
 )
-from features import feature_matrix, validate_feature_columns
+from features import read_train_test_csv, scaled_feature_matrix
 from utils import set_random_seed
-
-
-def load_processed(
-    train_path: Path, test_path: Path
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    train = pd.read_csv(train_path, parse_dates=["timestamp"])
-    test = pd.read_csv(test_path, parse_dates=["timestamp"])
-    validate_feature_columns(train)
-    validate_feature_columns(test)
-    return train, test
 
 
 def contamination_from_labels(train_df: pd.DataFrame) -> float:
@@ -88,7 +78,7 @@ def run_train(
     n_estimators: int = 200,
 ) -> IsolationForest:
     set_random_seed(random_state)
-    train_df, test_df = load_processed(train_path, test_path)
+    train_df, test_df = read_train_test_csv(train_path, test_path)
     scaler = joblib.load(scaler_path)
 
     normal_mask = train_df["is_anomaly"].to_numpy() == 0
@@ -97,7 +87,7 @@ def run_train(
     else:
         fit_df = train_df
 
-    X_fit = scaler.transform(feature_matrix(fit_df))
+    X_fit = scaled_feature_matrix(fit_df, scaler)
     contamination = contamination_from_labels(train_df)
 
     model = train_isolation_forest(
@@ -110,7 +100,7 @@ def run_train(
     model_out.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_out)
 
-    X_test = scaler.transform(feature_matrix(test_df))
+    X_test = scaled_feature_matrix(test_df, scaler)
     scores, flags = score_points(model, X_test)
 
     metrics_dir.mkdir(parents=True, exist_ok=True)

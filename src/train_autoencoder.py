@@ -13,7 +13,6 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -28,22 +27,12 @@ from config import (
     PROCESSED_TRAIN_CSV,
     RANDOM_SEED,
 )
-from features import feature_matrix, validate_feature_columns
+from features import read_train_test_csv, scaled_feature_matrix
 from utils import set_random_seed
 
 
-def load_processed(
-    train_path: Path, test_path: Path
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    train = pd.read_csv(train_path, parse_dates=["timestamp"])
-    test = pd.read_csv(test_path, parse_dates=["timestamp"])
-    validate_feature_columns(train)
-    validate_feature_columns(test)
-    return train, test
-
-
 def build_autoencoder(input_dim: int) -> keras.Model:
-    """Dense 7→32→16→8→16→32→7 as in project spec."""
+    """Dense ``N→32→16→8→16→32→N`` bottleneck; ``N`` is feature dimension (``N_FEATURES``)."""
     inp = keras.Input(shape=(input_dim,))
     x = layers.Dense(32, activation="relu")(inp)
     x = layers.Dense(16, activation="relu")(x)
@@ -78,12 +67,12 @@ def run_train(
     set_random_seed(random_state)
     tf.random.set_seed(random_state)
 
-    train_df, test_df = load_processed(train_path, test_path)
+    train_df, test_df = read_train_test_csv(train_path, test_path)
     scaler = joblib.load(scaler_path)
 
     normal_mask = train_df["is_anomaly"].to_numpy() == 0
     fit_df = train_df.loc[normal_mask] if normal_mask.sum() >= 32 else train_df
-    X_fit = scaler.transform(feature_matrix(fit_df)).astype(np.float32)
+    X_fit = scaled_feature_matrix(fit_df, scaler, dtype=np.float32)
 
     n_features = X_fit.shape[1]
     model = build_autoencoder(n_features)
@@ -120,7 +109,7 @@ def run_train(
     }
     threshold_out.write_text(json.dumps(threshold_payload, indent=2), encoding="utf-8")
 
-    X_test = scaler.transform(feature_matrix(test_df)).astype(np.float32)
+    X_test = scaled_feature_matrix(test_df, scaler, dtype=np.float32)
     test_errors = reconstruction_mse(model, X_test)
     pred_flag = (test_errors > threshold).astype(np.int8)
 

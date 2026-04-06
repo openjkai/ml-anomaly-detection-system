@@ -2,8 +2,18 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Protocol
+
 import numpy as np
 import pandas as pd
+
+
+class SupportsTransform(Protocol):
+    """Fitted sklearn-style scaler or any object with ``transform(X) -> ndarray``."""
+
+    def transform(self, X: np.ndarray) -> np.ndarray: ...
+
 
 # Canonical order for models, scaler, and CSV feature columns (see also config re-export).
 FEATURE_COLUMNS: tuple[str, ...] = (
@@ -25,10 +35,14 @@ __all__ = [
     "FEATURE_COLUMNS",
     "FEATURE_COLUMNS_LIST",
     "N_FEATURES",
+    "SupportsTransform",
     "assert_finite_feature_array",
     "assert_numeric_feature_columns",
     "feature_frame",
     "feature_matrix",
+    "read_metrics_csv",
+    "read_train_test_csv",
+    "scaled_feature_matrix",
     "validate_feature_columns",
 ]
 
@@ -72,3 +86,43 @@ def feature_matrix(df: pd.DataFrame) -> np.ndarray:
     X = df.loc[:, FEATURE_COLUMNS_LIST].to_numpy(dtype=np.float64, copy=False)
     assert_finite_feature_array(X)
     return X
+
+
+def scaled_feature_matrix(
+    df: pd.DataFrame,
+    scaler: SupportsTransform,
+    *,
+    dtype: type | np.dtype = np.float64,
+) -> np.ndarray:
+    """``scaler.transform(feature_matrix(df))`` with optional output dtype (e.g. float32 for TF)."""
+    X = scaler.transform(feature_matrix(df))
+    if np.dtype(dtype) == np.dtype(np.float64):
+        return X
+    return X.astype(dtype, copy=False)
+
+
+def _parse_timestamp_if_present(df: pd.DataFrame) -> pd.DataFrame:
+    if "timestamp" in df.columns:
+        df = df.copy()
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+    return df
+
+
+def read_train_test_csv(
+    train_path: Path, test_path: Path
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Load processed train/test CSVs and validate feature columns."""
+    train = _parse_timestamp_if_present(pd.read_csv(train_path))
+    test = _parse_timestamp_if_present(pd.read_csv(test_path))
+    validate_feature_columns(train)
+    validate_feature_columns(test)
+    return train, test
+
+
+def read_metrics_csv(path: Path, *, expect_labels: bool = True) -> pd.DataFrame:
+    """Load a metrics CSV (train, test, or raw-shaped frame) with feature validation."""
+    df = _parse_timestamp_if_present(pd.read_csv(path))
+    validate_feature_columns(df)
+    if expect_labels and "is_anomaly" not in df.columns:
+        raise ValueError("Expected column is_anomaly")
+    return df

@@ -32,7 +32,7 @@ from config import (
     OUTPUTS_PLOTS_DIR,
     PROCESSED_TEST_CSV,
 )
-from features import feature_matrix, validate_feature_columns
+from features import read_metrics_csv, scaled_feature_matrix
 from train_autoencoder import reconstruction_mse
 from train_isolation_forest import score_points
 
@@ -165,12 +165,11 @@ def run_evaluate(
     except AttributeError:
         pass
 
-    test_df = pd.read_csv(test_path, parse_dates=["timestamp"])
-    validate_feature_columns(test_df)
+    test_df = read_metrics_csv(test_path)
     y_true = test_df["is_anomaly"].to_numpy(dtype=int)
 
     scaler = joblib.load(scaler_path)
-    X_test = scaler.transform(feature_matrix(test_df)).astype(np.float32)
+    X_test = scaled_feature_matrix(test_df, scaler, dtype=np.float32)
 
     if_model: IsolationForest = joblib.load(if_path)
     if_scores, if_flags = score_points(if_model, X_test)
