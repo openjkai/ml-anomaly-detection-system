@@ -1,32 +1,36 @@
 ---
-description: Conventional Commits — one subject line ≤100 chars, one sentence, no tool footers
+description: One-line commits only — Conventional Commits subject ≤100 chars, no body by default
 alwaysApply: true
 ---
 
 # Git commit messages (Conventional Commits)
 
+## Default: one line only
+
+- **Use a single subject line.** Do **not** add a commit **body**, bullets, paragraphs, or “detailed” explanations unless the user **explicitly** asks for a longer message.
+- Agents and generators should output **only** that one line (no blank line + body).
+
 ## Subject line (required)
 
-- **Exactly one line** — the whole commit message is **one sentence** (no second sentence on the same line; no `;` chaining two ideas).
+- **Exactly one line** — **one sentence** (no second sentence on the same line; no `;` chaining two ideas).
 - **Maximum 100 characters** for the **entire** subject (count spaces; `type`, optional `scope`, colon, and description all count).
-- Use Conventional Commits shape:
+- Shape:
 
 ```text
 <type>(<scope>): <description>
 ```
 
-- **`type`** (pick one): `feat` | `fix` | `chore` | `docs` | `style` | `refactor` | `test` | `ci` | `perf` | `build` | `revert`
-- **`(scope)`** — **optional**. Short area in **lowercase**, e.g. `(api)`, `(data)`, `(models)`, `(ml)`, `(deps)`. Omit both parentheses when there is no scope: `feat: add training script`.
-- **`description`** — imperative mood, **lowercase** after the colon, **no trailing period**.
+- **`type`**: `feat` | `fix` | `chore` | `docs` | `style` | `refactor` | `test` | `ci` | `perf` | `build` | `revert`
+- **`(scope)`** — **optional**, lowercase, e.g. `(api)`, `(data)`, `(ml)`. Omit when not needed: `feat: add training script`.
+- **`description`** — imperative, **lowercase** after the colon, **no trailing period**.
 
-### Examples (good — each ≤100 chars, one sentence)
+### Examples (good — each ≤100 chars)
 
 ```text
 feat(data): add synthetic metrics generator
 fix(ml): correct train/test temporal split
-chore(deps): bump ruff and add pyproject
-docs: update quick start for preprocess step
-refactor(features): centralize column spec and numeric validation
+chore(deps): bump ruff and pyproject
+refactor(features): centralize column spec and validation
 ```
 
 ### Examples (avoid)
@@ -43,12 +47,12 @@ refactor: do X; also do Y
 
 ## Breaking changes
 
-- Add `!` after type/scope: `feat(api)!: remove legacy score route` (still must be ≤100 chars).
-- Or put `BREAKING CHANGE: ...` in the commit **body** (blank line after subject). Body does not count toward the 100-character rule.
+- Prefer **one line** with `!`: `feat(api)!: remove legacy score route` (still ≤100 chars).
+- Only if the user wants a **long** note: `BREAKING CHANGE: ...` in the body after a blank line — and **only when they ask** for that format.
 
-## Body (optional)
+## Body (only if the user asks)
 
-After a **blank line**, explain *why* or add links. The **subject** stays one line and ≤100 chars.
+- Do **not** add a body by default. If the user asks for rationale, links, or a longer message, then a **blank line** and body are allowed.
 
 ## Do not add tool or vendor footers
 
@@ -63,7 +67,7 @@ To stop Cursor from appending its own trailer: **Cursor Settings → Agent → A
 
 - Ensure the folder is a **git repo** and there are **staged changes** (the generator often uses the diff).
 - Reload the window after changing rules.
-- If generation still does nothing, use **Chat** and ask: “Write a conventional commit for my staged changes” — this rule still applies.
+- If generation still does nothing, use **Chat** and ask for a **one-line** conventional commit for staged changes.
 
 ## If history used a different style
 
