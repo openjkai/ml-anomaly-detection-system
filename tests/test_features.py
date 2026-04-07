@@ -14,9 +14,11 @@ sys.path.insert(0, str(SRC))
 from features import (  # noqa: E402
     FEATURE_COLUMNS,
     FEATURE_COLUMNS_LIST,
+    FEATURE_DISPLAY_NAMES,
     N_FEATURES,
     assert_finite_feature_array,
     assert_numeric_feature_columns,
+    feature_display_name,
     feature_frame,
     feature_matrix,
     read_metrics_csv,
@@ -42,6 +44,9 @@ def test_feature_constants():
     assert N_FEATURES == len(FEATURE_COLUMNS) == 7
     assert FEATURE_COLUMNS_LIST == list(FEATURE_COLUMNS)
     assert list(FEATURE_COLUMNS)[0] == "cpu_usage"
+    assert set(FEATURE_DISPLAY_NAMES.keys()) == set(FEATURE_COLUMNS)
+    assert feature_display_name("cpu_usage") == "CPU usage (%)"
+    assert feature_display_name("unknown_col") == "unknown_col"
 
 
 def test_validate_feature_columns_ok():

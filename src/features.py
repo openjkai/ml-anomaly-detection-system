@@ -31,10 +31,29 @@ N_FEATURES: int = len(FEATURE_COLUMNS)
 # Pandas treats a tuple of labels as a MultiIndex key; use a list for normal columns.
 FEATURE_COLUMNS_LIST: list[str] = list(FEATURE_COLUMNS)
 
+# Short labels for plots, logs, and APIs (keys match ``FEATURE_COLUMNS``).
+FEATURE_DISPLAY_NAMES: dict[str, str] = {
+    "cpu_usage": "CPU usage (%)",
+    "memory_usage": "Memory (%)",
+    "request_latency_ms": "Latency (ms)",
+    "error_rate": "Error rate",
+    "request_count": "Request count",
+    "disk_io": "Disk I/O",
+    "network_in_mb": "Network in (MB)",
+}
+
+
+def feature_display_name(column: str) -> str:
+    """Human-readable label for a feature column, or ``column`` if unknown."""
+    return FEATURE_DISPLAY_NAMES.get(column, column)
+
+
 __all__ = [
     "FEATURE_COLUMNS",
     "FEATURE_COLUMNS_LIST",
+    "FEATURE_DISPLAY_NAMES",
     "N_FEATURES",
+    "feature_display_name",
     "SupportsTransform",
     "assert_finite_feature_array",
     "assert_numeric_feature_columns",
