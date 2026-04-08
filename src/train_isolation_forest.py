@@ -24,6 +24,7 @@ from config import (
     RANDOM_SEED,
 )
 from features import read_train_test_csv, scaled_feature_matrix
+from scoring import score_points
 from utils import set_random_seed
 
 
@@ -49,22 +50,6 @@ def train_isolation_forest(
     )
     model.fit(X)
     return model
-
-
-def score_points(
-    model: IsolationForest, X: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Return (anomaly_score, is_outlier).
-
-    ``anomaly_score`` increases when the point is more anomalous (negated ``score_samples``).
-    ``is_outlier`` is 1 if the model flags an anomaly, else 0.
-    """
-    raw = model.score_samples(X)
-    anomaly_score = -raw
-    pred = model.predict(X)
-    is_outlier = (pred == -1).astype(np.int8)
-    return anomaly_score, is_outlier
 
 
 def run_train(

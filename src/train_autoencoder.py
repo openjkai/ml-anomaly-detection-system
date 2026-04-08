@@ -28,6 +28,7 @@ from config import (
     RANDOM_SEED,
 )
 from features import read_train_test_csv, scaled_feature_matrix
+from scoring import reconstruction_mse
 from utils import set_random_seed
 
 
@@ -43,11 +44,6 @@ def build_autoencoder(input_dim: int) -> keras.Model:
     model = keras.Model(inp, out, name="metrics_autoencoder")
     model.compile(optimizer="adam", loss="mse")
     return model
-
-
-def reconstruction_mse(model: keras.Model, X: np.ndarray) -> np.ndarray:
-    pred = model.predict(X, verbose=0)
-    return np.mean((X - pred) ** 2, axis=1)
 
 
 def run_train(

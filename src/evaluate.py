@@ -7,7 +7,6 @@ Writes text reports under ``outputs/metrics/`` and figures under ``outputs/plots
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import joblib
@@ -33,13 +32,7 @@ from config import (
     PROCESSED_TEST_CSV,
 )
 from features import read_metrics_csv, scaled_feature_matrix
-from train_autoencoder import reconstruction_mse
-from train_isolation_forest import score_points
-
-
-def load_threshold(path: Path) -> float:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    return float(data["threshold"])
+from scoring import load_ae_threshold, reconstruction_mse, score_points
 
 
 def plot_confusion_matrix(cm: np.ndarray, title: str, out_path: Path) -> None:
@@ -175,7 +168,7 @@ def run_evaluate(
     if_scores, if_flags = score_points(if_model, X_test)
 
     ae_model = tf.keras.models.load_model(ae_path)
-    threshold = load_threshold(threshold_path)
+    threshold = load_ae_threshold(threshold_path)
     ae_scores = reconstruction_mse(ae_model, X_test)
     ae_flags = (ae_scores > threshold).astype(np.int8)
 
