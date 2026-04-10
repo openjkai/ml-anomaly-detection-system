@@ -98,3 +98,4 @@ def test_predict_batch_returns_scores(tmp_path: Path):
     row = rows[0]
     assert "if_score" in row and "ae_mse" in row
     assert "if_pred" in row and "ae_pred" in row
+    assert "anomaly_alert" in row

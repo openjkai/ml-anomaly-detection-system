@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import joblib
+import numpy as np
 
 SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
@@ -65,4 +66,9 @@ def test_predict_smoke(tmp_path: Path):
     )
     assert out_path.exists()
     assert "if_score" in df.columns and "ae_mse" in df.columns
+    assert "anomaly_alert" in df.columns
+    assert np.array_equal(
+        df["anomaly_alert"].to_numpy(),
+        np.maximum(df["if_pred"].to_numpy(), df["ae_pred"].to_numpy()),
+    )
     joblib.load(tmp_path / "if.pkl")

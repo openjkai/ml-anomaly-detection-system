@@ -60,7 +60,12 @@ def load_predictors(
 
 
 def predict_dataframe(df: pd.DataFrame, bundle: PredictorBundle) -> pd.DataFrame:
-    """Append IF/AE scores and binary predictions (copies ``df``)."""
+    """
+    Append IF/AE scores and binary predictions (copies ``df``).
+
+    ``anomaly_alert`` is 1 if either model flags an anomaly (logical OR), suitable
+    for downstream alerting when any detector fires.
+    """
     assert_numeric_feature_columns(df)
     X = scaled_feature_matrix(df, bundle.scaler, dtype=np.float32)
     if_scores, if_flags = score_points(bundle.if_model, X)
@@ -71,6 +76,7 @@ def predict_dataframe(df: pd.DataFrame, bundle: PredictorBundle) -> pd.DataFrame
     out["if_pred"] = if_flags
     out["ae_mse"] = ae_scores
     out["ae_pred"] = ae_flags
+    out["anomaly_alert"] = np.maximum(if_flags, ae_flags).astype(np.int8)
     return out
 
 
