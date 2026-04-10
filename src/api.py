@@ -8,10 +8,19 @@ from typing import Annotated
 import pandas as pd
 import uvicorn
 from fastapi import Depends, FastAPI, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, create_model
 
-from features import FEATURE_COLUMNS, FEATURE_DISPLAY_NAMES
+from features import FEATURE_COLUMNS, FEATURE_DISPLAY_NAMES, feature_metadata
 from predict import PredictorBundle, load_predictors, predict_dataframe
+
+MetricRow = create_model(
+    "MetricRow",
+    __doc__="One row of operational metrics (same order as FEATURE_COLUMNS).",
+    **{
+        col: (float, Field(..., description=FEATURE_DISPLAY_NAMES[col]))
+        for col in FEATURE_COLUMNS
+    },
+)
 
 
 def create_app(bundle: PredictorBundle | None = None) -> FastAPI:
@@ -35,18 +44,6 @@ def create_app(bundle: PredictorBundle | None = None) -> FastAPI:
     return app
 
 
-class MetricRow(BaseModel):
-    """One row of operational metrics (same order as ``FEATURE_COLUMNS``)."""
-
-    cpu_usage: float = Field(..., description="CPU utilization %")
-    memory_usage: float = Field(..., description="Memory %")
-    request_latency_ms: float
-    error_rate: float
-    request_count: float
-    disk_io: float
-    network_in_mb: float
-
-
 class PredictRequest(BaseModel):
     rows: list[MetricRow] = Field(..., min_length=1)
 
@@ -61,12 +58,11 @@ def get_bundle(request: Request) -> PredictorBundle:
 def _register_routes(app: FastAPI) -> None:
     @app.get("/health")
     def health() -> dict[str, str | dict[str, str]]:
+        meta = feature_metadata()
         return {
             "status": "ok",
             "features": ",".join(FEATURE_COLUMNS),
-            "feature_display_names": {
-                c: FEATURE_DISPLAY_NAMES[c] for c in FEATURE_COLUMNS
-            },
+            "feature_display_names": {m["name"]: m["display_name"] for m in meta},
         }
 
     @app.post("/predict")

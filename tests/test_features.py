@@ -21,6 +21,7 @@ from features import (  # noqa: E402
     feature_display_name,
     feature_frame,
     feature_matrix,
+    feature_metadata,
     read_metrics_csv,
     read_train_test_csv,
     scaled_feature_matrix,
@@ -47,6 +48,14 @@ def test_feature_constants():
     assert set(FEATURE_DISPLAY_NAMES.keys()) == set(FEATURE_COLUMNS)
     assert feature_display_name("cpu_usage") == "CPU usage (%)"
     assert feature_display_name("unknown_col") == "unknown_col"
+
+
+def test_feature_metadata_order_and_labels():
+    meta = feature_metadata()
+    assert len(meta) == N_FEATURES
+    names = [m["name"] for m in meta]
+    assert names == list(FEATURE_COLUMNS)
+    assert all(m["display_name"] == FEATURE_DISPLAY_NAMES[m["name"]] for m in meta)
 
 
 def test_validate_feature_columns_ok():

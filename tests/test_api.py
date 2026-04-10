@@ -8,7 +8,8 @@ sys.path.insert(0, str(SRC))
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from api import create_app  # noqa: E402
+from api import MetricRow, create_app  # noqa: E402
+from features import FEATURE_COLUMNS  # noqa: E402
 from generate_data import generate_dataframe  # noqa: E402
 from predict import load_predictors  # noqa: E402
 from preprocess import run_preprocess  # noqa: E402
@@ -55,6 +56,10 @@ def _trained_bundle(tmp_path: Path):
         autoencoder_path=tmp_path / "ae.keras",
         threshold_path=tmp_path / "th.json",
     )
+
+
+def test_metric_row_matches_feature_columns():
+    assert list(MetricRow.model_fields.keys()) == list(FEATURE_COLUMNS)
 
 
 def test_health_includes_feature_display_names(tmp_path: Path):

@@ -48,12 +48,24 @@ def feature_display_name(column: str) -> str:
     return FEATURE_DISPLAY_NAMES.get(column, column)
 
 
+def feature_metadata() -> list[dict[str, str]]:
+    """
+    Ordered metadata for each model feature: canonical name and display label.
+
+    Use this for API docs, health checks, and clients that need a stable column order.
+    """
+    return [
+        {"name": c, "display_name": FEATURE_DISPLAY_NAMES[c]} for c in FEATURE_COLUMNS
+    ]
+
+
 __all__ = [
     "FEATURE_COLUMNS",
     "FEATURE_COLUMNS_LIST",
     "FEATURE_DISPLAY_NAMES",
     "N_FEATURES",
     "feature_display_name",
+    "feature_metadata",
     "SupportsTransform",
     "assert_finite_feature_array",
     "assert_numeric_feature_columns",
