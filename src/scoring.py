@@ -36,3 +36,15 @@ def reconstruction_mse(model: keras.Model, X: np.ndarray) -> np.ndarray:
     """Per-row mean squared reconstruction error."""
     pred = model.predict(X, verbose=0)
     return np.mean((X - pred) ** 2, axis=1)
+
+
+def combined_anomaly_alert(if_pred: np.ndarray, ae_pred: np.ndarray) -> np.ndarray:
+    """
+    Logical OR over binary flags: 1 if either detector flagged an anomaly.
+
+    Matches ``anomaly_alert`` in ``predict.predict_dataframe``.
+    """
+    return np.maximum(
+        if_pred.astype(np.int8, copy=False),
+        ae_pred.astype(np.int8, copy=False),
+    )

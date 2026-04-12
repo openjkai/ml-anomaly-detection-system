@@ -26,7 +26,12 @@ from features import (
     read_metrics_csv,
     scaled_feature_matrix,
 )
-from scoring import load_ae_threshold, reconstruction_mse, score_points
+from scoring import (
+    combined_anomaly_alert,
+    load_ae_threshold,
+    reconstruction_mse,
+    score_points,
+)
 
 
 @dataclass(frozen=True)
@@ -76,7 +81,7 @@ def predict_dataframe(df: pd.DataFrame, bundle: PredictorBundle) -> pd.DataFrame
     out["if_pred"] = if_flags
     out["ae_mse"] = ae_scores
     out["ae_pred"] = ae_flags
-    out["anomaly_alert"] = np.maximum(if_flags, ae_flags).astype(np.int8)
+    out["anomaly_alert"] = combined_anomaly_alert(if_flags, ae_flags)
     return out
 
 

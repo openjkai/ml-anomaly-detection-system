@@ -10,7 +10,11 @@ from sklearn.ensemble import IsolationForest
 SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
 
-from scoring import load_ae_threshold, score_points  # noqa: E402
+from scoring import (  # noqa: E402
+    combined_anomaly_alert,
+    load_ae_threshold,
+    score_points,
+)
 
 
 def test_score_points_shape():
@@ -21,6 +25,13 @@ def test_score_points_shape():
     scores, flags = score_points(model, X)
     assert scores.shape == (40,) and flags.shape == (40,)
     assert np.unique(flags).tolist() in ([0], [1], [0, 1])
+
+
+def test_combined_anomaly_alert():
+    if_p = np.array([0, 0, 1, 1], dtype=np.int8)
+    ae_p = np.array([0, 1, 0, 1], dtype=np.int8)
+    out = combined_anomaly_alert(if_p, ae_p)
+    assert np.array_equal(out, np.array([0, 1, 1, 1], dtype=np.int8))
 
 
 def test_load_ae_threshold(tmp_path: Path):

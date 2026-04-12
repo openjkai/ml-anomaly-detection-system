@@ -50,6 +50,7 @@ def test_predict_smoke(tmp_path: Path):
     )
 
     from predict import load_predictors, run_predict_csv  # noqa: E402
+    from scoring import combined_anomaly_alert  # noqa: E402
 
     bundle = load_predictors(
         scaler_path=tmp_path / "scaler.pkl",
@@ -69,6 +70,9 @@ def test_predict_smoke(tmp_path: Path):
     assert "anomaly_alert" in df.columns
     assert np.array_equal(
         df["anomaly_alert"].to_numpy(),
-        np.maximum(df["if_pred"].to_numpy(), df["ae_pred"].to_numpy()),
+        combined_anomaly_alert(
+            df["if_pred"].to_numpy(),
+            df["ae_pred"].to_numpy(),
+        ),
     )
     joblib.load(tmp_path / "if.pkl")

@@ -32,7 +32,12 @@ from config import (
     PROCESSED_TEST_CSV,
 )
 from features import read_metrics_csv, scaled_feature_matrix
-from scoring import load_ae_threshold, reconstruction_mse, score_points
+from scoring import (
+    combined_anomaly_alert,
+    load_ae_threshold,
+    reconstruction_mse,
+    score_points,
+)
 
 
 def plot_confusion_matrix(cm: np.ndarray, title: str, out_path: Path) -> None:
@@ -171,11 +176,13 @@ def run_evaluate(
     threshold = load_ae_threshold(threshold_path)
     ae_scores = reconstruction_mse(ae_model, X_test)
     ae_flags = (ae_scores > threshold).astype(np.int8)
+    alert_flags = combined_anomaly_alert(if_flags, ae_flags)
 
     lines: list[str] = []
     for name, y_pred in (
         ("isolation_forest", if_flags),
         ("autoencoder", ae_flags),
+        ("combined_or", alert_flags),
     ):
         lines.append(f"=== {name} ===")
         lines.append(classification_report(y_true, y_pred, digits=4))
@@ -190,6 +197,7 @@ def run_evaluate(
     for name, y_pred, scores in (
         ("isolation_forest", if_flags, if_scores),
         ("autoencoder", ae_flags, ae_scores),
+        ("combined_or", alert_flags, None),
     ):
         m = evaluate_binary(y_true, y_pred, name, y_score=scores)
         summary_lines.append(
@@ -202,11 +210,17 @@ def run_evaluate(
 
     cm_if = confusion_matrix(y_true, if_flags)
     cm_ae = confusion_matrix(y_true, ae_flags)
+    cm_alert = confusion_matrix(y_true, alert_flags)
     plot_confusion_matrix(
         cm_if, "Isolation Forest", plots_dir / "confusion_matrix_if.png"
     )
     plot_confusion_matrix(
         cm_ae, "Autoencoder (MSE)", plots_dir / "confusion_matrix_ae.png"
+    )
+    plot_confusion_matrix(
+        cm_alert,
+        "Combined (OR)",
+        plots_dir / "confusion_matrix_combined.png",
     )
 
     df_if = test_df[["timestamp", "is_anomaly"]].copy()
