@@ -42,6 +42,16 @@ class PredictorBundle:
     ae_threshold: float
 
 
+# Columns appended by ``predict_dataframe`` (scores and binary flags).
+PREDICTION_SCORE_COLUMNS: tuple[str, ...] = (
+    "if_score",
+    "if_pred",
+    "ae_mse",
+    "ae_pred",
+    "anomaly_alert",
+)
+
+
 def load_predictors(
     scaler_path: Path = MODEL_SCALER,
     isolation_forest_path: Path = MODEL_ISOLATION_FOREST,

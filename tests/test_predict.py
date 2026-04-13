@@ -49,7 +49,11 @@ def test_predict_smoke(tmp_path: Path):
         batch_size=64,
     )
 
-    from predict import load_predictors, run_predict_csv  # noqa: E402
+    from predict import (  # noqa: E402
+        PREDICTION_SCORE_COLUMNS,
+        load_predictors,
+        run_predict_csv,
+    )
     from scoring import combined_anomaly_alert  # noqa: E402
 
     bundle = load_predictors(
@@ -68,6 +72,7 @@ def test_predict_smoke(tmp_path: Path):
     assert out_path.exists()
     assert "if_score" in df.columns and "ae_mse" in df.columns
     assert "anomaly_alert" in df.columns
+    assert all(c in df.columns for c in PREDICTION_SCORE_COLUMNS)
     assert np.array_equal(
         df["anomaly_alert"].to_numpy(),
         combined_anomaly_alert(

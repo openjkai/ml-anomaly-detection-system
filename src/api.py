@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from contextlib import asynccontextmanager
 from typing import Annotated
 
@@ -10,6 +11,7 @@ import uvicorn
 from fastapi import Depends, FastAPI, Request
 from pydantic import BaseModel, Field, create_model
 
+from config import API_DEFAULT_HOST, API_DEFAULT_PORT
 from features import FEATURE_COLUMNS, FEATURE_DISPLAY_NAMES, feature_metadata
 from predict import PredictorBundle, load_predictors, predict_dataframe
 
@@ -79,7 +81,22 @@ app = create_app()
 
 
 def main() -> None:
-    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=False)
+    parser = argparse.ArgumentParser(
+        description="Run the anomaly detection HTTP API (loads models at startup)",
+    )
+    parser.add_argument(
+        "--host",
+        default=API_DEFAULT_HOST,
+        help=f"Bind address (default: {API_DEFAULT_HOST})",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=API_DEFAULT_PORT,
+        help=f"Port (default: {API_DEFAULT_PORT})",
+    )
+    args = parser.parse_args()
+    uvicorn.run("api:app", host=args.host, port=args.port, reload=False)
 
 
 if __name__ == "__main__":

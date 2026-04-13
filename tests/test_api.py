@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 from api import MetricRow, create_app  # noqa: E402
 from features import FEATURE_COLUMNS  # noqa: E402
 from generate_data import generate_dataframe  # noqa: E402
-from predict import load_predictors  # noqa: E402
+from predict import PREDICTION_SCORE_COLUMNS, load_predictors  # noqa: E402
 from preprocess import run_preprocess  # noqa: E402
 from train_autoencoder import run_train as run_train_ae  # noqa: E402
 from train_isolation_forest import run_train as run_train_if  # noqa: E402
@@ -99,3 +99,4 @@ def test_predict_batch_returns_scores(tmp_path: Path):
     assert "if_score" in row and "ae_mse" in row
     assert "if_pred" in row and "ae_pred" in row
     assert "anomaly_alert" in row
+    assert all(c in row for c in PREDICTION_SCORE_COLUMNS)
