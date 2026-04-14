@@ -11,9 +11,14 @@ import uvicorn
 from fastapi import Depends, FastAPI, Request
 from pydantic import BaseModel, Field, create_model
 
-from config import API_DEFAULT_HOST, API_DEFAULT_PORT
+from config import API_DEFAULT_HOST, API_DEFAULT_PORT, API_VERSION
 from features import FEATURE_COLUMNS, FEATURE_DISPLAY_NAMES, feature_metadata
-from predict import PredictorBundle, load_predictors, predict_dataframe
+from predict import (
+    PREDICTION_SCORE_COLUMNS,
+    PredictorBundle,
+    load_predictors,
+    predict_dataframe,
+)
 
 MetricRow = create_model(
     "MetricRow",
@@ -41,7 +46,11 @@ def create_app(bundle: PredictorBundle | None = None) -> FastAPI:
         finally:
             del app.state.predictor_bundle
 
-    app = FastAPI(title="Anomaly detection", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(
+        title="Anomaly detection",
+        version=API_VERSION,
+        lifespan=lifespan,
+    )
     _register_routes(app)
     return app
 
@@ -59,12 +68,14 @@ def get_bundle(request: Request) -> PredictorBundle:
 
 def _register_routes(app: FastAPI) -> None:
     @app.get("/health")
-    def health() -> dict[str, str | dict[str, str]]:
+    def health() -> dict[str, str | dict[str, str] | list[str]]:
         meta = feature_metadata()
         return {
             "status": "ok",
+            "version": API_VERSION,
             "features": ",".join(FEATURE_COLUMNS),
             "feature_display_names": {m["name"]: m["display_name"] for m in meta},
+            "prediction_columns": list(PREDICTION_SCORE_COLUMNS),
         }
 
     @app.post("/predict")
@@ -95,8 +106,18 @@ def main() -> None:
         default=API_DEFAULT_PORT,
         help=f"Port (default: {API_DEFAULT_PORT})",
     )
+    parser.add_argument(
+        "--reload",
+        action="store_true",
+        help="Watch source files and restart (development only)",
+    )
     args = parser.parse_args()
-    uvicorn.run("api:app", host=args.host, port=args.port, reload=False)
+    uvicorn.run(
+        "api:app",
+        host=args.host,
+        port=args.port,
+        reload=args.reload,
+    )
 
 
 if __name__ == "__main__":

@@ -29,5 +29,6 @@ RANDOM_SEED = 42
 DEFAULT_TEST_SIZE = 0.2
 
 # HTTP API (``python -m api`` / ``uvicorn api:app``)
+API_VERSION = "0.1.0"
 API_DEFAULT_HOST = "0.0.0.0"
 API_DEFAULT_PORT = 8000

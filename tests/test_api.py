@@ -9,6 +9,7 @@ sys.path.insert(0, str(SRC))
 from fastapi.testclient import TestClient  # noqa: E402
 
 from api import MetricRow, create_app  # noqa: E402
+from config import API_VERSION  # noqa: E402
 from features import FEATURE_COLUMNS  # noqa: E402
 from generate_data import generate_dataframe  # noqa: E402
 from predict import PREDICTION_SCORE_COLUMNS, load_predictors  # noqa: E402
@@ -70,6 +71,8 @@ def test_health_includes_feature_display_names(tmp_path: Path):
     assert r.status_code == 200
     body = r.json()
     assert body["status"] == "ok"
+    assert body["version"] == API_VERSION
+    assert body["prediction_columns"] == list(PREDICTION_SCORE_COLUMNS)
     assert "cpu_usage" in body["feature_display_names"]
     assert body["feature_display_names"]["cpu_usage"] == "CPU usage (%)"
 
