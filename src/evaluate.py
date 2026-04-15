@@ -241,6 +241,17 @@ def run_evaluate(
         plots_dir / "timeline_ae.png",
     )
 
+    df_combo = test_df[["timestamp", "is_anomaly"]].copy()
+    df_combo["score"] = if_scores
+    df_combo["pred"] = alert_flags
+    plot_timeline(
+        df_combo,
+        "score",
+        "pred",
+        "Combined (OR) alerts (score axis = IF anomaly score)",
+        plots_dir / "timeline_combined.png",
+    )
+
     plot_score_hist(
         if_scores,
         y_true,

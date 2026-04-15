@@ -63,6 +63,19 @@ def test_metric_row_matches_feature_columns():
     assert list(MetricRow.model_fields.keys()) == list(FEATURE_COLUMNS)
 
 
+def test_root_returns_discovery_json(tmp_path: Path):
+    bundle = _trained_bundle(tmp_path)
+    app = create_app(bundle=bundle)
+    with TestClient(app) as client:
+        r = client.get("/")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["service"] == "anomaly-detection"
+    assert body["version"] == API_VERSION
+    assert body["health"] == "/health"
+    assert body["predict"] == "/predict"
+
+
 def test_health_includes_feature_display_names(tmp_path: Path):
     bundle = _trained_bundle(tmp_path)
     app = create_app(bundle=bundle)

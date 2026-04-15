@@ -67,6 +67,18 @@ def get_bundle(request: Request) -> PredictorBundle:
 
 
 def _register_routes(app: FastAPI) -> None:
+    @app.get("/")
+    def root() -> dict[str, str]:
+        """Minimal discovery for operators and health probes."""
+        return {
+            "service": "anomaly-detection",
+            "version": API_VERSION,
+            "health": "/health",
+            "predict": "/predict",
+            "openapi": "/openapi.json",
+            "docs": "/docs",
+        }
+
     @app.get("/health")
     def health() -> dict[str, str | dict[str, str] | list[str]]:
         meta = feature_metadata()
